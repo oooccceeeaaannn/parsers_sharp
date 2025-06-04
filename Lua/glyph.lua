@@ -166,10 +166,11 @@ glyphtypes = {
 	on = 8,
 	nextto = 8,
 	feeling = 8,
-	meta = 5,
+	metaglyph = 5,
 	metatext = 5,
 	metaevent = 5,
 	metanode = 5,
+	metalogic = 5,
 	metanot = 4,
 	node = 0,
 	group = 3,
@@ -177,7 +178,6 @@ glyphtypes = {
 	group3 = 3,
 	refers = 8,
 	event = 0,
-	obj = 0,
 }
 glyphtypes["3d"] = 2
 glyphtypes["end"] = 2
@@ -195,6 +195,8 @@ negatetable = {}
 symbolmap = {}
 metaindicators = {}
 metatextindicators = {}
+parser_prefixdata = {}
+tileparser_prefixdata = {}
 
 nounandparam = {}
 propandparam = {}
@@ -2139,28 +2141,10 @@ editor_objlist["glyph_sleep"] =
 formatobjlist()
 
 function toometafunc(name)
-	if (string.sub(name,1,5) == "text_") then
+	if is_str_special_prefixed(name) then
 		local basefound = foundbasereference(name)
 		local textfound = foundreference(name)
 		if (textfound ~= 1) and (basefound == 1) then
-			return true
-		end
-	elseif (string.sub(name,1,6) == "glyph_") then
-		local basefound = foundbasereference(name)
-		local glyphfound = foundreference(name)
-		if (glyphfound ~= 1) and (basefound == 1) then
-			return true
-		end
-	elseif (string.sub(name,1,6) == "event_") then
-		local basefound = foundbasereference(name)
-		local glyphfound = foundreference(name)
-		if (glyphfound ~= 1) and (basefound == 1) then
-			return true
-		end
-	elseif (string.sub(name,1,5) == "node_") then
-		local basefound = foundbasereference(name)
-		local nodefound = foundreference(name)
-		if (nodefound ~= 1) and (basefound == 1) then
 			return true
 		end
 	end
@@ -2168,7 +2152,7 @@ function toometafunc(name)
 end
 
 function foundreference(name)
-	if (name == "text") or (name == "glyph") then
+	if is_str_broad_noun(name) then
 		return 1
 	end
 	if (string.sub(name,1,5) == "text_") then
@@ -2176,7 +2160,7 @@ function foundreference(name)
 			return 1
 		end
 		return 0
-	elseif (string.sub(name,1,6) == "glyph_") or (string.sub(name,1,6) == "event_") or (string.sub(name,1,5) == "node_") then
+	elseif is_str_special_prefixed(name) then
 		if (unitreference[name] ~= nil) then
 			return 1
 		end
@@ -2187,38 +2171,15 @@ function foundreference(name)
 end
 
 function foundbasereference(name)
-	local base = name
-	if (string.sub(base,1,5) == "text_") or (string.sub(base,1,6) == "glyph_") or (string.sub(base,1,6) == "event_") or (string.sub(base,1,5) == "node_") then
-		if (string.sub(base,1,5) == "text_") or (string.sub(base,1,5) == "node_") then
-			base = string.sub(base, 6)
-		elseif (string.sub(base,1,6) == "glyph_") or (string.sub(base,1,6) == "event_") then
-			base = string.sub(base, 7)
-		end
-	end
-	return foundreference(base)
+	return foundreference(get_ref(name))
 end
 
 condlist['references'] = function(params,checkedconds,checkedconds_,cdata)
-	if (cdata.unitid == 1) or (cdata.unitid == 2) then
-		return false
-	end
-	local unit = mmf.newObject(cdata.unitid)
-	if (unit  == nil) then
-		return false
-	end
-	local unitname = unit.strings[UNITNAME]
-	params[1] = string.sub(params[1], 2)
-	if (string.sub(unitname, 1, 5) == "text_") or (string.sub(unitname, 1, 5) == "node_") then
-		return (string.sub(unitname, 6) == params[1]), checkedconds
-	end
-	if (string.sub(unitname, 1, 6) == "glyph_") or (string.sub(unitname, 1, 6) == "event_") then
-		return (string.sub(unitname, 7) == params[1]), checkedconds
-	end
-	return false, checkedconds
+	error("Stop looking at my code :(")
 end
 
 
-
+--[[ --the below functions are unused
 function referencestext(unit, param)
 	local unitname = unit.strings[UNITNAME]
 	if (string.sub(unitname, 1, 5) == "text_") then
@@ -2250,6 +2211,7 @@ function referencesnode(unit, param)
 	end
 	return false, checkedconds
 end
+--]]
 
 function isnoun(input_string, id)
 	if string.sub(input_string,1,6) ~= "glyph_" then
@@ -2258,13 +2220,15 @@ function isnoun(input_string, id)
 	if (metaglyphdata[id] ~= 0) and (metaglyphdata[id] ~= nil) then
 		return true
 	end
-
+	if (input_string == "glyph_glyph_") or (input_string == "glyph_text_") or (input_string == "glyph_event_") or (input_string == "glyph_node_") or (input_string == "glyph_logic_") then
+		return false
+	end
     -- for i,j in pairs(glyphnouns) do
     --     if ("glyph_" .. j == input_string) or ("glyph_glyph_" .. j == input_string) or ("glyph_text_" .. j == input_string) or ("glyph_not " .. j == input_string) or ("glyph_glyph_not " .. j == input_string) or ("glyph_text_not " .. j == input_string) then
     --         return true
     --     end
     -- end
-	if (string.sub(input_string,1,12) == "glyph_glyph_") or (string.sub(input_string,1,11) == "glyph_text_") or (string.sub(input_string,1,12) == "glyph_event_") or (string.sub(input_string,1,11) == "glyph_node_") or (string.sub(input_string,1,10) == "glyph_obj_") then
+	if (string.sub(input_string,1,12) == "glyph_glyph_") or (string.sub(input_string,1,11) == "glyph_text_") or (string.sub(input_string,1,12) == "glyph_event_") or (string.sub(input_string,1,11) == "glyph_node_") or (string.sub(input_string,1,12) == "glyph_logic_") then
 		return true
 	end
 	if (glyphtypes[string.sub(input_string,7)] == 0) or ((string.sub(input_string,1,10) == "glyph_not ") and (glyphtypes[string.sub(input_string,11)] == 0)) then
@@ -2343,7 +2307,7 @@ function isglyphmeta(input_string, id)
 	if string.sub(input_string,1,6) ~= "glyph_" then
 		return false
 	end
-	return (input_string == "glyph_metaglyph") or (input_string == "glyph_metatext") or (input_string == "glyph_metaevent") or (input_string == "glyph_metanode")
+	return (input_string == "glyph_metaglyph") or (input_string == "glyph_metatext") or (input_string == "glyph_metaevent") or (input_string == "glyph_metanode") or (input_string == "glyph_metalogic")
 end
 
 function isprefix(input_string, id)
@@ -2380,6 +2344,15 @@ function isinfix(input_string, id)
 		return true
 	end
     return false
+end
+
+local function isparser_prefix(str)
+	if (string.sub(str, 1, 6) == "glyph_") then
+		if is_str_special_prefix(string.sub(str, 7)) then
+			return true
+		end
+	end
+	return false
 end
 
 function donegateglyph(x, y)
@@ -2421,11 +2394,12 @@ function makenegatetable()
 	end
 end
 
-function metaprefix(x, y)
+local function metaparserprefix(x, y)
 	local is_meta = false
 	local is_text = false
 	local is_event = false
 	local is_node = false
+	local is_logic = false
 	local im_done = false
 	if (tilemetaglyphdata[x + y * roomsizex] ~= nil) then
 		if tilemetaglyphdata[x + y * roomsizex] == 1 then
@@ -2436,6 +2410,8 @@ function metaprefix(x, y)
 			return "event_"
 		elseif tilemetaglyphdata[x + y * roomsizex] == 4 then
 			return "node_"
+		elseif tilemetaglyphdata[x + y * roomsizex] == 5 then
+			return "logic_"
 		elseif tilemetaglyphdata[x + y * roomsizex] == 0 then
 			return ""
 		end
@@ -2453,6 +2429,8 @@ function metaprefix(x, y)
 					break
 				elseif (name == "glyph_metanode") then
 					is_node = true
+				elseif (name == "glyph_metalogic") then
+					is_logic = true
 				elseif (name == "glyph_metaglyph") then
 					is_meta = true
 					im_done = true
@@ -2476,11 +2454,67 @@ function metaprefix(x, y)
 	elseif is_node then
 		tilemetaglyphdata[x + y * roomsizex] = 4
 		return "node_"
+	elseif is_logic then
+		tilemetaglyphdata[x + y * roomsizex] = 5
+		return "logic_"
 	else
 		tilemetaglyphdata[x + y * roomsizex] = 0
 		return ""
 	end
 end
+
+local function parser_prefix(x, y)
+	local is_meta = 0
+	local is_text = 0
+	local is_event = 0
+	local is_node = 0
+	local is_logic = 0
+	local im_done = 0
+	if (tileparser_prefixdata[x + y * roomsizex] ~= nil) then
+		is_meta, is_text, is_event, is_node, is_logic = table.unpack(tileparser_prefixdata[x + y * roomsizex])
+		return string.rep("glyph_", is_meta) ..
+		 string.rep("text_", is_text) ..
+		  string.rep("event_", is_event) ..
+		   string.rep("node_", is_node) ..
+		    string.rep("logic_", is_logic)
+	end
+	if unitmap[x + y * roomsizex] ~= nil then
+		for i, v in pairs(unitmap[x + y * roomsizex]) do
+			local unit = getunitfromid(v)
+			local name = unit.strings[UNITNAME]
+			if (name == "glyph_text_") then
+				is_text = 1 + is_text
+			elseif (name == "glyph_event_") then
+				is_event = 1 + is_event
+			elseif (name == "glyph_node_") then
+				is_node = 1 + is_node
+			elseif (name == "glyph_logic_") then
+				is_logic = 1 + is_logic
+			elseif (name == "glyph_glyph_") then
+				is_meta = 1 + is_meta
+
+			end
+		end
+	end
+	-- priority: Glyph text event node logic
+	local prefix = string.rep("glyph_", is_meta) ..
+	 string.rep("text_", is_text) ..
+	  string.rep("event_", is_event) ..
+	   string.rep("node_", is_node) ..
+	    string.rep("logic_", is_logic)
+	tileparser_prefixdata[x + y * roomsizex] = {is_meta, is_text, is_event, is_node, is_logic}
+	return prefix
+end
+
+function metaprefix(x, y, disableparser_prefix_)
+	local disableparser_prefix = disableparser_prefix_ or false
+	if disableparser_prefix then
+		return metaparserprefix(x, y)
+	else
+		return metaparserprefix(x, y) .. parser_prefix(x, y)
+	end
+end
+
 -- Types
 -- Noun - 0
 -- Verb - 1
@@ -2491,6 +2525,7 @@ end
 -- And - 6
 -- Prefix - 7
 -- Infix - 8
+-- parser_prefix - 10
 function matchglyphtype(input_string, id, glyphtypes0, glyphextras)
 	for i, j in pairs(glyphextras) do
 		if ("glyph_" .. j == input_string) then
@@ -2532,6 +2567,10 @@ function matchglyphtype(input_string, id, glyphtypes0, glyphextras)
 			end
 		elseif (glyphtype == 8) then
 			if isinfix(input_string, id) then
+				return true
+			end
+		elseif (glyphtype) == 10 then
+			if isparser_prefix(input_string) then
 				return true
 			end
 		end
@@ -2674,7 +2713,7 @@ function getandparams(base_id, x, y, evaluate_, id)
 					end
 					local unit = getunitfromid(v2)
 					local name = unit.strings[UNITNAME]
-					local meta_prefix = metaprefix(x + j[1], y +j[2])
+					local meta_prefix = metaprefix(x + j[1], y +j[2], isparser_prefix(name))
 					if isnoun(name, v2) or isprop(name, v2) or isgroupglyph(name, v2) or isprefix(name, v2) or isinfix(name, v2) then
 						if donegateglyph(x + j[1], y +j[2]) and (meta_prefix == "") then
 							table.insert(return_table, {"not " .. string.sub(name, 7),v2})
@@ -2715,7 +2754,7 @@ function getinfixparams(infix_name, base_id, x, y, evaluate_, id)
 					end
 					local unit = getunitfromid(v2)
 					local name = unit.strings[UNITNAME]
-					local meta_prefix = metaprefix(x + j[1], y +j[2])
+					local meta_prefix = metaprefix(x + j[1], y +j[2], isparser_prefix(name))
 					if matchglyphtype(name, v2, infixargtypes[infix_name], infixargextras[infix_name]) then
 						if donegateglyph(x + j[1], y +j[2]) and (meta_prefix == "") then
 							table.insert(return_table, "not " .. string.sub(name, 7))
@@ -2745,7 +2784,7 @@ end
 function getnounandparams(x, y, id)
 	local return_table = getnounandparamstile(x, y, id)
 	local noun = getunitfromid(id)
-	local am_i_meta = metaprefix(x, y)
+	local am_i_meta = metaprefix(x, y, isparser_prefix(noun.strings[UNITNAME]))
 	if donegateglyph(x, y) and (am_i_meta == "") then
 		table.insert(return_table, {"not " .. string.sub(noun.strings[UNITNAME], 7),id})
 	elseif (am_i_meta ~= "") then
@@ -2765,7 +2804,7 @@ function getnounandparamstile(x, y, id)
 				for i2,v2 in pairs(unitmap[(x + j[1]) + (y + j[2]) * roomsizex]) do
 					local unit = getunitfromid(v2)
 					local name = unit.strings[UNITNAME]
-					local meta_prefix = metaprefix(x + j[1], y +j[2])
+					local meta_prefix = metaprefix(x + j[1], y +j[2], isparser_prefix(name))
 					if isnoun(name, v2) then
 						if donegateglyph(x + j[1], y+ j[2]) and (meta_prefix == "") then
 							table.insert(return_table, {"not " ..string.sub(name, 7),v2})
@@ -2864,7 +2903,7 @@ end
 function getproperbothandparams(x, y, id)
 	local return_table = getproperbothandparamstile(x, y, id)
 	local noun = getunitfromid(id)
-	local am_i_meta = metaprefix(x, y)
+	local am_i_meta = metaprefix(x, y, isparser_prefix(noun.strings[UNITNAME]))
 	if donegateglyph(x, y) and (am_i_meta == "") then
 		table.insert(return_table, {"not " .. string.sub(noun.strings[UNITNAME], 7),id})
 	elseif (am_i_meta ~= "") then
@@ -2892,7 +2931,7 @@ function getproperbothandparamstile(x, y, id)
 				for i2,v2 in pairs(unitmap[(x + j[1]) + (y + j[2]) * roomsizex]) do
 					local unit = getunitfromid(v2)
 					local name = unit.strings[UNITNAME]
-					local meta_prefix = metaprefix(x + j[1], y +j[2])
+					local meta_prefix = metaprefix(x + j[1], y +j[2], isparser_prefix(name))
 					if (isnoun(name, v2) and amnoun) or (isprop(name, v2) and not amnoun) then
 						if donegateglyph(x + j[1], y+ j[2]) and (meta_prefix == "") then
 							table.insert(return_table, {"not " ..string.sub(name, 7),v2})
@@ -2963,7 +3002,7 @@ function getprefixandparams(x, y, id)
 end
 
 function resetallmetaglyph()
-
+	
 end
 
 function determinemetaglyphs(glyphtable)
@@ -2971,7 +3010,7 @@ function determinemetaglyphs(glyphtable)
 		local unit = getunitfromid(j)
 		local x, y = unit.values[XPOS], unit.values[YPOS]
 		local name = unit.strings[UNITNAME]
-		local prefix = metaprefix(x, y)
+		local prefix = metaparserprefix(x, y)
 		if (prefix == "glyph_") then
 			metaglyphdata[j] = 1
 			tilemetaglyphdata[x + y * roomsizex] = 1
@@ -2984,6 +3023,9 @@ function determinemetaglyphs(glyphtable)
 		elseif (prefix == "node_") then
 			metaglyphdata[j] = 4
 			tilemetaglyphdata[x + y * roomsizex] = 4
+		elseif (prefix == "logic_") then
+			metaglyphdata[j] = 5
+			tilemetaglyphdata[x + y * roomsizex] = 5
 		else
 			metaglyphdata[j] = 0
 			tilemetaglyphdata[x + y * roomsizex] = 0
@@ -3033,6 +3075,8 @@ function doglyphs(symbols)
 	prefixandparam = {}
 	tilemetaglyphdata = {}
 	nearbysave = {}
+	parser_prefixdata = {}
+	tileparser_prefixdata = {}
 	newglyphunits = copytable(newglyphunits, glyphunits)[1]
 	for i, j in pairs(symbols) do
 		if testcond(j[2],j[1]) then
@@ -3557,4 +3601,52 @@ function checksymbolchanges(unitid,unitname)
 			end
 		end
 	end
+end
+
+function add_glyph_using_text(name)
+	local textname = "text_" .. name
+	local textdata = editor_objlist[textname]
+	if textdata == nil then
+		error("Glyph was attempted to be added before it's text was added")
+		return false
+	end
+
+	local type = textdata.type
+
+	if type == 5 then
+		error("Attempting to add a letter glyph - glyphs don't have letters")
+		return false
+	end
+	if type == 7 then type = 8
+	elseif type == 3 then type = 7 end
+	if string.sub(name,1,5) == "group" then type = 3 end
+	
+	local sprite
+	if (textdata.sprite ~= nil) then
+		sprite = "glyph_" .. string.sub(textdata.sprite, 6)
+	end
+
+	local glyph_data = {
+		name = "glyph_"..name,
+		sprite = sprite,
+		sprite_in_root = false,
+		unittype = "object",
+		tags = {"abstract", "glyph"},
+		tiling = -1,
+		type = 0,
+		layer = 1,
+		colour = textdata.colour,
+		colour_active = textdata.colour_active,
+	}
+	glyphtypes[name] = type
+	if type == 1 then -- verb
+		verbargtypes["glyph_" .. name] = textdata.argtype
+		verbargextras["glyph_" .. name] = textdata.argextra or {}
+	elseif type == 8 then
+		infixargtypes["glyph_" .. name] = textdata.argtype
+		infixargextras["glyph_" .. name] = textdata.argextra or {}
+	end
+	table.insert(editor_objlist_order, "glyph_" .. name)
+	editor_objlist["glyph_" .. name] = glyph_data
+	return true
 end

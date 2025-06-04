@@ -15,6 +15,8 @@ editor_objlist["text_logic"] =
 	colour_active = {3, 1},
 }
 
+add_glyph_using_text("logic")
+
 table.insert(editor_objlist_order, "text_log")
 
 editor_objlist["text_log"] = 
@@ -126,6 +128,9 @@ addlogic("omnihalt",12,{2,1},{2,2},{},-1)
 
 --special nouns
 addlogic("logic",0,{3,0},{3,1},{},-1)
+addlogic("glyph",0,{3,2},{3,3},{},-1)
+addlogic("node",0,{6,1},{2,4},{},-1)
+addlogic("event",0,{5,2},{5,3},{},-1)
 addlogic("text",0,{4,0},{4,1},{},-1)
 addlogic("all",0,{0,1},{0,3},{},-1)
 addlogic("level",0,{4,0},{4,1},{},-1)

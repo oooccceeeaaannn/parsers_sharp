@@ -2859,7 +2859,7 @@ function codecheck(unitid,ox,oy,cdir_,ignore_end_,wordunitresult_,parse_letter)
 			local w = 1
 
 			if (v.values[TYPE] ~= 5 or parse_letter) and (v.flags[DEAD] == false) then
-				if (v.strings[UNITTYPE] == "text") then
+				if (string.sub(v.strings[UNITNAME],1,5) == "text_") then
 					table.insert(result, {{b}, w, v.strings[NAME], v.values[TYPE], cdir})
 				else
 					if (#wordunits > 0) then
@@ -2881,14 +2881,14 @@ function codecheck(unitid,ox,oy,cdir_,ignore_end_,wordunitresult_,parse_letter)
 								table.insert(result, {{b}, w, "node", v.values[TYPE], cdir})
 							elseif (v.strings[UNITTYPE] == "logic") then
 								table.insert(result, {{b}, w, "logic", v.values[TYPE], cdir})
-							elseif not isglyph(v) then
-								if metatext_textisword and (string.sub(v.strings[UNITNAME],1,5) == "text_") then
-									table.insert(result, {{b}, w, v.strings[NAME], v.values[TYPE], cdir})
-								else
-									table.insert(result, {{b}, w, v.strings[UNITNAME], v.values[TYPE], cdir})
-								end
-							else
+							elseif isglyph(v) then
 								table.insert(result, {{b}, w, "glyph", 0, cdir})
+							elseif (string.sub(v.strings[UNITNAME],1,5) == "text_") then
+								table.insert(result, {{b}, w, v.strings[NAME], v.values[TYPE], cdir})
+							elseif (string.sub(v.strings[UNITNAME],1,6) == "event_") then
+								table.insert(result, {{b}, w, string.sub(v.strings[UNITNAME],7), v.values[TYPE], cdir})
+							else
+								table.insert(result, {{b}, w, v.strings[UNITNAME], v.values[TYPE], cdir})
 							end
 						end
 					end

@@ -74,6 +74,12 @@ editor_objlist["text_logic_"] =
 	colour_active = {3, 1},
 }
 
+for _,name in ipairs(special_prefixes) do
+  add_glyph_using_text(name)
+  glyphtypes[name] = 10
+  editor_objlist["glyph_" .. name].colour = editor_objlist["glyph_" .. name].colour_active
+end
+
 formatobjlist()
 
 
