@@ -128,6 +128,7 @@ addlogic("omnihalt",12,{2,1},{2,2},{},-1)
 
 --special nouns
 addlogic("logic",0,{3,0},{3,1},{},-1)
+addlogic("orbit",0,{0,1},{0,2},{},-1)
 addlogic("glyph",0,{3,2},{3,3},{},-1)
 addlogic("node",0,{6,1},{2,4},{},-1)
 addlogic("event",0,{5,2},{5,3},{},-1)

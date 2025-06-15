@@ -74,6 +74,22 @@ editor_objlist["text_logic_"] =
 	colour_active = {3, 1},
 }
 
+table.insert(editor_objlist_order, "text_orbit_")
+
+editor_objlist["text_orbit_"] =
+{
+	name = "text_orbit_",
+	sprite = "text_orbitpre",
+	sprite_in_root = false,
+	unittype = "text",
+	tags = {"orbits","text", "abstract"},
+	tiling = -1,
+	type = 4,
+	layer = 20,
+	colour = {0,1},
+	colour_active = {0,2},
+}
+
 for _,name in ipairs(special_prefixes) do
   add_glyph_using_text(name)
   glyphtypes[name] = 10

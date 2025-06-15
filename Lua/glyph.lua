@@ -309,7 +309,7 @@ table.insert(editor_objlist_order, "glyph_right")
 table.insert(editor_objlist_order, "glyph_best")
 table.insert(editor_objlist_order, "glyph_fallright")
 table.insert(editor_objlist_order, "glyph_fallleft")
-table.insert(editor_objlist_order, "glyph_fallup")
+table.insert(editor_objlist_order, "glyph_fall")
 table.insert(editor_objlist_order, "glyph_falldown")
 table.insert(editor_objlist_order, "glyph_power")
 table.insert(editor_objlist_order, "glyph_auto")
@@ -1734,9 +1734,9 @@ editor_objlist["glyph_fallleft"] =
 	colour_active = {5, 3},
 }
 
-editor_objlist["glyph_fallup"] = 
+editor_objlist["glyph_fall"] = 
 {
-	name = "glyph_fallup",
+	name = "glyph_fall",
 	sprite_in_root = false,
 	unittype = "object",
 	tags = {"abstract"},

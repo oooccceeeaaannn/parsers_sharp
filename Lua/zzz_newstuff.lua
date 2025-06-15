@@ -12,10 +12,14 @@ table.insert(editor_objlist_order, "glyph_metanode")
 table.insert(editor_objlist_order, "text_metanode")
 table.insert(editor_objlist_order, "glyph_metalogic")
 table.insert(editor_objlist_order, "text_metalogic")
+table.insert(editor_objlist_order, "glyph_metaorbit")
+table.insert(editor_objlist_order, "text_metaorbit")
 table.insert(editor_objlist_order, "event_node")
 table.insert(editor_objlist_order, "node_glyph")
 table.insert(editor_objlist_order, "node_logic")
+table.insert(editor_objlist_order, "node_orbit")
 table.insert(editor_objlist_order, "event_logic")
+table.insert(editor_objlist_order, "event_orbit")
 table.insert(editor_objlist_order, "text_metanot")
 table.insert(editor_objlist_order, "glyph_metanot")
 table.insert(editor_objlist_order, "text_refers")
@@ -132,6 +136,31 @@ editor_objlist["glyph_metalogic"] =
 	colour_active = {3, 1},
 }
 
+editor_objlist["text_metaorbit"] =
+{
+	name = "text_metaorbit",
+	sprite_in_root = false,
+	unittype = "text",
+	tags = {"text", "abstract"},
+	tiling = -1,
+	type = -1,
+	layer = 20,
+	colour = {0,1},
+	colour_active = {0,2},
+}
+
+editor_objlist["glyph_metaorbit"] =
+{
+	name = "glyph_metaorbit",
+	sprite_in_root = false,
+	unittype = "object",
+	tags = {"abstract", "glyphs"},
+	tiling = -1,
+	type = 0,
+	layer = 1,
+	colour = {0,1},
+	colour_active = {0,2},
+}
 
 editor_objlist["text_metaevent"] =
 {
@@ -186,6 +215,18 @@ editor_objlist["event_logic"] =
 	colour_active = {3, 1},
 }
 
+editor_objlist["event_orbit"] =
+{
+	name = "event_orbit",
+	sprite_in_root = false,
+	unittype = "text",
+	tags = {"text","abstract", "events"},
+	tiling = -1,
+	type = 0,
+	layer = 20,
+	colour = {0,1},
+	colour_active = {0,2},
+}
 
 editor_objlist["text_refers"] = 
 {
@@ -243,6 +284,12 @@ editor_objlist["text__NONE_"] =
 add_node(false, "glyph", 0, {3, 2}, {3, 3})
 add_node(false, "event", 0, {5, 2}, {5, 3})
 add_node(false, "logic", 0, {3, 0}, {3, 1})
+add_node(false, "orbit", 0, {0,1}, {0,2})
 add_node(false, "refers", 7, {0, 1}, {0, 3}, {0, 2})
+
+addorbit("glyph",0,{3, 2}, {3, 3},{},-1)
+addorbit("event",0,{5, 2}, {5, 3},{},-1)
+addorbit("node",0,{6, 1}, {2, 4},{},-1)
+addorbit("logic",0,{3, 0}, {3, 1},{},-1)
 
 formatobjlist()

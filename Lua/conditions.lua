@@ -1967,26 +1967,30 @@ condlist.powered = function(params,checkedconds,checkedconds_,cdata) --To correc
 	end
 	
 condlist['refers'] = function(params,checkedconds,checkedconds_,cdata)
-for i, j in pairs(params) do
-    local _params = " "..j
+	for i, j in pairs(params) do
+		local _params = j
 
-	local unitname = mmf.newObject(cdata.unitid).strings[UNITNAME]
-	_params = string.sub(_params, 2)
-	if (string.sub(unitname, 1, 5) == "text_") or (string.sub(unitname, 1, 5) == "node_") then
-		if (string.sub(unitname, 6) == _params) then
-			return true, checkedconds
+		local unitname = mmf.newObject(cdata.unitid).strings[UNITNAME]
+
+		if (string.sub(unitname, 1, 5) == "text_") or (string.sub(unitname, 1, 5) == "node_") then
+			if (string.sub(unitname, 6) == _params) then
+				return true, checkedconds
+			end
+		elseif (string.sub(unitname, 1, 6) == "glyph_") or (string.sub(unitname, 1, 6) == "event_") or (string.sub(unitname, 1, 6) == "orbit_") or (string.sub(unitname, 1, 6) == "logic_") then
+			if (string.sub(unitname, 7) == _params) then
+				return true, checkedconds
+			end
 		end
-	elseif (string.sub(unitname, 1, 6) == "glyph_") or (string.sub(unitname, 1, 6) == "event_") or (string.sub(unitname, 1, 6) == "logic_") then
-		if (string.sub(unitname, 7) == _params) then
+
+		if hasfeature(unitname, "is", "word", cdata.unitid) and (unitname == _params) then
+			return true, checkedconds
+		elseif hasfeature(unitname, "is", "symbol", cdata.unitid) and (unitname == _params) then
+			return true, checkedconds
+		elseif hasfeature(unitname, "is", "flow", cdata.unitid) and (unitname == _params) then
+			return true, checkedconds
+		elseif hasfeature(unitname, "is", "center", cdata.unitid) and (unitname == _params) then
 			return true, checkedconds
 		end
 	end
-
-    if hasfeature(unitname,"is","word",cdata.unitid) and (unitname == _params) then
-        return true, checkedconds
-    elseif hasfeature(unitname,"is","symbol",cdata.unitid) and (unitname == _params) then
-        return true, checkedconds
-    end
-end
 	return false, checkedconds
 end

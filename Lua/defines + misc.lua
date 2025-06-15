@@ -104,7 +104,7 @@ function writemetalevel()
 					-- imagine flag: print pink T text
 					local color = textoverlaycolor(unit, {4,1}, {4,2})
 					if true then
-						local sequenceText, sequenceGlyph, sN, sE, sL = makemetastring(unitname)
+						local sequenceText, sequenceGlyph, sN, sE, sL, sO = makemetastring(unitname)
 						writetext(sequenceText:sub(2), unit.fixed, (8 * unit.scaleX),
 								-(6 * unit.scaleY), "metaoverlay", true,
 								1, true, color)
@@ -128,6 +128,10 @@ function writemetalevel()
 								1, true, color)
 						color = textoverlaycolor(unit, {3,1}, {3,0})
 						writetext(sL:sub(2), unit.fixed, (8 * unit.scaleX),
+								-(6 * unit.scaleY), "metaoverlay", true,
+								1, true, color)
+						color = textoverlaycolor(unit, {0,2}, {0,1})
+						writetext(sO:sub(2), unit.fixed, (8 * unit.scaleX),
 								-(6 * unit.scaleY), "metaoverlay", true,
 								1, true, color)
 					else
@@ -762,9 +766,69 @@ function getunitswithverb(rule2, ignorethese_, checkedconds)
 	return result
 end
 
+function getunitswitheffect(rule3,nolevels_,ignorethese_,checkedconds,ignorebroken_)
+	local group = {}
+	local result = {}
+	local ignorethese = ignorethese_ or {}
+	local ignorebroken = ignorebroken_ or false
+	
+	local nolevels = nolevels_ or false
+	
+	if (featureindex[rule3] ~= nil) then
+		for i,v in ipairs(featureindex[rule3]) do
+			local rule = v[1]
+			local conds = v[2]
+			
+			if (rule[2] == "is") and (conds[1] ~= "never") and (findnoun(rule[1],nlist.brief) == false) then
+				table.insert(group, {rule[1], conds})
+			end
+		end
+		
+		for i,v in ipairs(group) do
+			if (v[1] ~= "empty") and (not is_str_broad_noun(v[1])) and (not is_string_metax(v[1],true)) then
+				local name = v[1]
+				local fgroupmembers = unitlists[name]
+				
+				local valid = true
+				
+				if (name == "level") and nolevels then
+					valid = false
+				end
+				
+				if (fgroupmembers ~= nil) and valid then
+					for a,b in ipairs(fgroupmembers) do
+						if testcond(v[2],b,nil,nil,nil,nil,checkedconds,ignorebroken) then
+							local unit = mmf.newObject(b)
+							
+							if (unit.flags[DEAD] == false) then
+								valid = true
+								
+								for c,d in ipairs(ignorethese) do
+									if (d == b) then
+										valid = false
+										break
+									end
+								end
+								
+								if valid then
+									table.insert(result, unit)
+								end
+							end
+						end
+					end
+				end
+			else
+				--table.insert(result, {2, v[2]})
+			end
+		end
+	end
+	
+	return result
+end
+
 function makemetastring(string)
 	local namestring = string
-	local sT, sG, sN, sE, sL = "", "", "", "", ""
+	local sT, sG, sN, sE, sL, sO = "", "", "", "", "", ""
 	while true do
 		if namestring:sub(1,5) == "text_" and #namestring > 5 then
 			sT = sT.."T"
@@ -772,6 +836,7 @@ function makemetastring(string)
 			sN = sN.." "
 			sE = sE.." "
 			sL = sL.." "
+			sO = sO.." "
 			namestring = namestring.gsub(namestring, "text_", "", 1)
 		elseif namestring:sub(1,6) == "glyph_" and #namestring > 6 then
 			sT = sT.." "
@@ -779,6 +844,7 @@ function makemetastring(string)
 			sN = sN.." "
 			sE = sE.." "
 			sL = sL.." "
+			sO = sO.." "
 			namestring = namestring.gsub(namestring, "glyph_", "", 1)
 		elseif namestring:sub(1, 5) == "node_" and #namestring > 5 then
 			sT = sT .. " "
@@ -786,6 +852,7 @@ function makemetastring(string)
 			sN = sN .. "N"
 			sE = sE .. " "
 			sL = sL .. " "
+			sO = sO .. " "
 			namestring = namestring.gsub(namestring, "node_", "", 1)
 		elseif namestring:sub(1, 6) == "event_" and #namestring > 6 then
 			sT = sT .. " "
@@ -793,6 +860,7 @@ function makemetastring(string)
 			sN = sN .. " "
 			sE = sE .. "E"
 			sL = sL .. " "
+			sO = sO .. " "
 			namestring = namestring.gsub(namestring, "event_", "", 1)
 		elseif namestring:sub(1, 6) == "logic_" and #namestring > 6 then
 			sT = sT .. " "
@@ -800,14 +868,23 @@ function makemetastring(string)
 			sN = sN .. " "
 			sE = sE .. " "
 			sL = sL .. "L"
+			sO = sO .. " "
 			namestring = namestring.gsub(namestring, "logic_", "", 1)
+		elseif namestring:sub(1, 5) == "orbit_" and #namestring > 5 then
+			sT = sT .. " "
+			sG = sG .. " "
+			sN = sN .. " "
+			sE = sE .. " "
+			sL = sL .. " "
+			sO = sO .. "O"
+			namestring = namestring.gsub(namestring, "orbit_", "", 1)
 		else
-			return sT, sG, sN, sE, sL
+			return sT, sG, sN, sE, sL, sO
 		end
 	end
 end
 
-broad_nouns = {"text", "glyph", "node", "event", "logic"}
+broad_nouns = {"text", "glyph", "node", "event", "logic", "orbit"}
 special_prefixes = {}
 for _, v in ipairs(broad_nouns) do
 	table.insert(special_prefixes, v .. "_")

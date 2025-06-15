@@ -7,7 +7,7 @@ function is_str_metalike_prop(str)
 end
 
 function is_str_writelike_verb(str)
-    if (str == "write" or str == "inscribe" or str == "code" or str == "log") then 
+    if (str == "write" or str == "inscribe" or str == "code" or str == "log") or (operator == "chart") then 
       return true
     end
     return false
@@ -38,6 +38,8 @@ function conversion(dolevels_)
 				tryautogenerate("logic_" .. thing)
 			elseif (not dolevels) and (operator == "code") and not is_str_special_prefix(name .. "_") and (string.sub(name,1,4)) ~= "meta" and (thing ~= "not " .. name) and unitreference["code_" .. thing] == nil and ((unitlists[name] ~= nil and #unitlists[name] > 0) or name == "empty" or name == "level") then
 				tryautogenerate("event_" .. thing)
+			elseif (not dolevels) and (operator == "chart") and not is_str_special_prefix(name .. "_") and (string.sub(name,1,4)) ~= "meta" and (thing ~= "not " .. name) and unitreference["code_" .. thing] == nil and ((unitlists[name] ~= nil and #unitlists[name] > 0) or name == "empty" or name == "level") then
+				tryautogenerate("orbit_" .. thing)
 			end
 
 			if (not is_str_broad_noun(name)) --@Merge: omg beeeeg if block
@@ -55,6 +57,7 @@ function conversion(dolevels_)
 			    and (getmat("glyph_" .. name) or getmat(name)))
 					or ((operator == "code") and getmat("event_" .. name))
 					or ((operator == "log") and (getmat("logic_" .. name) ~= nil))
+					or ((operator == "chart") and (getmat("orbit_" .. name) ~= nil))
 			  then -- @Merge: Original glyph mod has "((string.sub(name, 1, 5) == "text_") and getmat_text(name))". I think this is its own version of metatext??? in which case maybe not include it?
 				
 				if (featureindex[name] ~= nil) and (alreadydone[name] == nil) then
@@ -113,6 +116,18 @@ function conversion(dolevels_)
 									table.insert(output, {object, conds, "log"})
 								end
 							end
+						elseif (verb == "chart") then
+							if (string.sub(object, 1, 4) ~= "not ") and (target == name) then
+								if toometafunc("orbit_" .. object) then
+									table.insert(output, {"toometa", conds, "is"})
+                                    if objectlist["toometa"] == nil then
+                                        objectlist["toometa"] = 1
+                                        updatecode = 1
+                                    end
+                                else
+									table.insert(output, {object, conds, "chart"})
+								end
+							end
 						elseif (verb == "inscribe") then
 							if (string.sub(object, 1, 4) ~= "not ") and (target == name) then
 								if toometafunc("glyph_" .. object) then
@@ -151,7 +166,7 @@ function conversion(dolevels_)
 
 						if (op == "is") then
 							-- EDIT: add check for ECHO
-							if (findnoun(object,nlist.brief) == false) and (object ~= "word") and (object ~= "echo") and (object ~= "symbol") and not is_str_broad_noun(object) and (not is_str_metalike_prop(object)) then
+							if (findnoun(object,nlist.brief) == false) and (object ~= "word") and (object ~= "echo") and (object ~= "symbol") and (not is_str_broad_noun(object)) and (not is_str_metalike_prop(object)) then
 								table.insert(conversions, v3)
 							elseif (object == "all") then
 								--[[
@@ -264,8 +279,16 @@ function conversion(dolevels_)
 								if valid then
 									table.insert(conversions, {"logic_" .. name,conds})
 								end
+							elseif (object == "orbit") then
+								local valid = true -- don't attempt conversion if the object does not exist
+								if unitreference["orbit_" .. name] == nil and ((unitreference[name] ~= nil and unitlists[name] ~= nil and #unitlists[name] > 0) or name == "empty" or name == "level") then
+									valid = tryautogenerate("orbit_" .. name,name)
+								end
+								if valid then
+									table.insert(conversions, {"orbit_" .. name,conds})
+								end
 							end
-						elseif (op == "write") or (op == "inscribe") or (op == "draw") or (op == "log") or (op == "code") then
+						elseif (op == "write") or (op == "inscribe") or (op == "draw") or (op == "log") or (op == "code") or (op == "chart") then
 							table.insert(conversions, v3)
 						end
 					end
@@ -335,6 +358,8 @@ function convert(stuff,mats,dolevels_)
 								mat2 = "glyph_" .. matdata[1]
 							elseif (op == "log") then
 								mat2 = "logic_" .. matdata[1]
+							elseif (op == "chart") then
+								mat2 = "orbit_" .. matdata[1]
 							end
 
 							if (reverting == false) then
@@ -424,6 +449,8 @@ function convert(stuff,mats,dolevels_)
 								mat2 = "logic_" .. matdata[1]
 							elseif (op == "inscribe") then
 								mat2 = "glyph_" .. matdata[1]
+							elseif (op == "chart") then
+								mat2 = "orbit_" .. matdata[1]
 							end
 
 							local objectfound = false
@@ -762,7 +789,7 @@ function doconvert(data,extrarule_)
 				newunit.new = false
 				newunit.originalname = unit.originalname
 				
-				if (newunit.strings[UNITTYPE] == "text" or newunit.strings[UNITTYPE] == "node" or newunit.strings[UNITTYPE] == "logic") then
+				if (newunit.strings[UNITTYPE] == "text" or newunit.strings[UNITTYPE] == "node" or newunit.strings[UNITTYPE] == "logic") or (newunit.strings[UNITTYPE] == "orbit") then
 					updatecode = 1
 				else
 					local newname = newunit.strings[UNITNAME]
@@ -878,8 +905,8 @@ function doconvert(data,extrarule_)
 		
 		if delthis and (unit.flags[DEAD] == false) then
 			addundo({"remove",unit.strings[UNITNAME],unit.values[XPOS],unit.values[YPOS],unit.values[DIR],unit.values[ID],unit.values[ID],unit.strings[U_LEVELFILE],unit.strings[U_LEVELNAME],unit.values[VISUALLEVEL],unit.values[COMPLETED],unit.values[VISUALSTYLE],unit.flags[MAPLEVEL],unit.strings[COLOUR],unit.strings[CLEARCOLOUR],unit.followed,unit.back_init,unit.originalname,unit.strings[UNITSIGNTEXT]})
-			
-			if (unit.strings[UNITTYPE] == "text" or unit.strings[UNITTYPE] == "node" or unit.strings[UNITTYPE] == "logic") then
+
+			if (unit.strings[UNITTYPE] == "text" or unit.strings[UNITTYPE] == "node" or unit.strings[UNITTYPE] == "logic" or (newunit.strings[UNITTYPE] == "orbit")) then
 				updatecode = 1
 			end
 			

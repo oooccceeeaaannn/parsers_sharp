@@ -22,6 +22,7 @@ function code(alreadyrun_)
 
 		MF_removeblockeffect(0)
 		wordrelatedunits = {}
+		centerrelatedunits = {}
 
 		do_mod_hook("rule_update",{alreadyrun})
 
@@ -31,9 +32,12 @@ function code(alreadyrun_)
 			end
 			local checkthese = {}
 			local wordidentifier = ""
+			local centeridentifier = ""
 			wordunits,wordidentifier,wordrelatedunits = findwordunits()
 			symbolunits,symbolidentifier,symbolrelatedunits = findsymbolunits()
 			flowunits,flowidentifier,flowrelatedunits = findflowunits()
+			centerunits, centeridentifier, centerrelatedunits = findcenterunits()
+
 			local wordunitresult = {}
 
 			if (#wordunits > 0) then
@@ -134,6 +138,8 @@ function code(alreadyrun_)
 
 								if unit.strings[UNITTYPE] == "logic" then
 									table.insert(firstwords, {{unitid}, i, 1, "logic", 0, {}})
+								elseif unit.strings[UNITTYPE] == "orbit" then
+									table.insert(firstwords,{{unitid}, i, 1, "orbit", unit.values[TYPE], {}})
 								elseif not isglyph(unit) then
 									table.insert(firstwords, {{unitid}, i, 1, unit.strings[UNITNAME], unit.values[TYPE], {}})
 								else
@@ -199,6 +205,7 @@ function code(alreadyrun_)
 				end
 				docode(firstwords,wordunits)
 				dologic(flowunits)
+				doorbit(centerunits)
 				subrules()
 				grouprules()
 				playrulesound = postrules(alreadyrun)
@@ -212,6 +219,7 @@ function code(alreadyrun_)
 				local newsymbolunits,newsymbolidentifier,newsymbolrelatedunits = findsymbolunits()
 				local newbreakunits,newbreakidentifier,breakrelatedunits = findbreakunits()
 				local newflowunits,newflowidentifier,flowrelatedunits = findflowunits()
+				local newcenterunits, newcenteridentifier, centerrelatedunits = findcenterunits()
 
 				--MF_alert("ID comparison: " .. newwordidentifier .. " - " .. wordidentifier)
 
@@ -222,6 +230,9 @@ function code(alreadyrun_)
 					updatecode = 1
 					code(true)
 				elseif (newflowidentifier ~= flowidentifier) then
+					updatecode = 1
+					code(true)
+				elseif (newcenteridentifier ~= centeridentifier) then
 					updatecode = 1
 					code(true)
 				else
@@ -2887,6 +2898,8 @@ function codecheck(unitid,ox,oy,cdir_,ignore_end_,wordunitresult_,parse_letter)
 								table.insert(result, {{b}, w, v.strings[NAME], v.values[TYPE], cdir})
 							elseif (string.sub(v.strings[UNITNAME],1,6) == "event_") then
 								table.insert(result, {{b}, w, string.sub(v.strings[UNITNAME],7), v.values[TYPE], cdir})
+							elseif (v.strings[UNITTYPE] == "orbit") then
+								table.insert(result, { { b }, w, "orbit", v.values[TYPE], cdir })
 							else
 								table.insert(result, {{b}, w, v.strings[UNITNAME], v.values[TYPE], cdir})
 							end
@@ -3752,7 +3765,7 @@ function findwordunits()
 			local subid = ""
 
 			if (rule[2] == "is") then
-				if ((fullunitlist[name] ~= nil) or (name == "logic") or ((name == "glyph") and (#glyphunits > -1))) and (metatext_textisword or (name ~= "text" and string.sub(name,1,5) ~= "text_")) and (alreadydone[name] == nil) then
+				if ((fullunitlist[name] ~= nil) or (name == "logic") or (name == "orbit") or ((name == "glyph") and (#glyphunits > -1))) and (metatext_textisword or (name ~= "text" and string.sub(name,1,5) ~= "text_")) and (alreadydone[name] == nil) then
 					local these = findall({name,{}})
 					alreadydone[name] = 1
 
@@ -3959,7 +3972,7 @@ function postrules(alreadyrun_)
 							if (b ~= 0) then
 								local bunit = mmf.newObject(b)
 
-								if (bunit.strings[UNITTYPE] == "text" or bunit.strings[UNITTYPE] == "node" or bunit.strings[UNITTYPE] == "logic") or (string.sub(bunit.strings[UNITNAME], 1, 6) == "glyph_") then
+								if (bunit.strings[UNITTYPE] == "text" or bunit.strings[UNITTYPE] == "node" or bunit.strings[UNITTYPE] == "logic" or bunit.strings[UNITTYPE] == "orbit") or (string.sub(bunit.strings[UNITNAME], 1, 6) == "glyph_") then
 									bunit.active = true
 									setcolour(b,"active")
 								end
@@ -4026,11 +4039,15 @@ function postrules(alreadyrun_)
 					table.insert(targetlists, "log")
 				end
 
+				if (verb == "is") and (neweffect == "orbit") and (featureindex["orbit"] ~= nil) then
+					table.insert(targetlists, "chart")
+				end
+
 				for e,g in ipairs(targetlists) do
 					for a,b in ipairs(featureindex[g]) do
 						local same = comparerules(newbaserule,b[1])
 
-						if same or ((g == "inscribe") and (target == b[1][1]) and (b[1][2] == "inscribe")) or (((g == "write") or (g == "log")) and (target == b[1][1]) and ((b[1][2] == "write") or (b[1][2] == "log"))) or ((((neweffect == "text") and (string.sub(b[1][3], 1, 5)=="text_")) or ((neweffect == "glyph") and (string.sub(b[1][3], 1, 6)=="glyph_"))) and (target == b[1][1]) and (verb == b[1][2])) then
+						if same or ((g == "chart") and (target == b[1][1]) and (b[1][2] == "chart")) or ((g == "inscribe") and (target == b[1][1]) and (b[1][2] == "inscribe")) or (((g == "write") or (g == "log")) and (target == b[1][1]) and ((b[1][2] == "write") or (b[1][2] == "log"))) or ((((neweffect == "text") and (string.sub(b[1][3], 1, 5)=="text_")) or ((neweffect == "glyph") and (string.sub(b[1][3], 1, 6)=="glyph_"))) and (target == b[1][1]) and (verb == b[1][2])) then
 							--MF_alert(rule[1] .. ", " .. rule[2] .. ", " .. neweffect .. ": " .. b[1][1] .. ", " .. b[1][2] .. ", " .. b[1][3])
 							local theseconds = b[2]
 
@@ -4113,7 +4130,7 @@ function postrules(alreadyrun_)
 						local targetconds = rules[2]
 						local object = targetrule[3]
 
-						if (targetrule[1] == target) and (((targetrule[2] == "is") and (target ~= object)) or ((targetrule[2] == "inscribe") and (string.sub(object, 1, 4) ~= "not ")) or (((targetrule[2] == "write") or (targetrule[2] == "log") or (object == "meta")  or (object == "unmeta")) and (string.sub(object, 1, 4) ~= "not "))) and ((getmat(object) ~= nil) or (getmat_text(object) ~= false) or (object == "revert") or ((targetrule[2] == "inscribe") and (string.sub(object, 1, 4) ~= "not ")) or (((targetrule[2] == "write") or (targetrule[2] == "log")) and (string.sub(object, 1, 4) ~= "not ")) or is_str_metalike_prop(object)) and (string.sub(object, 1, 5) ~= "group") then
+						if (targetrule[1] == target) and (((targetrule[2] == "is") and (target ~= object)) or ((targetrule[2] == "inscribe") and (string.sub(object, 1, 4) ~= "not ")) or (((targetrule[2] == "write") or (targetrule[2] == "log") or (targetrule[2] == "chart") or (object == "meta")  or (object == "unmeta")) and (string.sub(object, 1, 4) ~= "not "))) and ((getmat(object) ~= nil) or (getmat_text(object) ~= false) or (object == "revert") or ((targetrule[2] == "inscribe") and (string.sub(object, 1, 4) ~= "not ")) or (((targetrule[2] == "write") or (targetrule[2] == "log") or (targetrule[2] == "chart")) and (string.sub(object, 1, 4) ~= "not ")) or is_str_metalike_prop(object)) and (string.sub(object, 1, 5) ~= "group") then
 							if (#newconds > 0) then
 								if (newconds[1] == "never") then
 									targetconds = {}

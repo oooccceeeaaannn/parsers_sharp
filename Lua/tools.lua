@@ -10,7 +10,7 @@ function delunit(unitid)
 		local unitlist_ = unitlists[unit.strings[UNITNAME]] or {}
 		local unittype = unit.strings[UNITTYPE]
 
-		if (unittype == "text" or unittype == "node") or (name == "glyph") then
+		if (unittype == "text" or unittype == "node") or (name == "glyph") or (unittype == "orbit") then
 			updatecode = 1
 		end
 
@@ -81,7 +81,7 @@ function delunit(unitid)
 			end
 		end
 
-		if ((unit.strings[UNITTYPE] == "text") or (unit.strings[UNITTYPE] == "logic")) and (codeunits ~= nil) then
+		if ((unit.strings[UNITTYPE] == "text") or (unit.strings[UNITTYPE] == "logic") or (unit.strings[UNITTYPE] == "orbit")) and (codeunits ~= nil) then
 			for i,v in pairs(codeunits) do
 				if (v == unitid) then
 					v = {}
@@ -323,7 +323,7 @@ function update(unitid,x,y,dir_)
 				dynamicat(oldx,oldy)
 			end
 
-			if (unittype == "text") or isglyph(unit) or (unittype == "node") or (unittype == "logic") then
+			if (unittype == "text") or (unittype == "orbit") or isglyph(unit) or (unittype == "node") or (unittype == "logic") then
 				updatecode = 1
 			end
 
@@ -332,6 +332,9 @@ function update(unitid,x,y,dir_)
 			end
 			if (featureindex["symbol"] ~= nil) then
 				checksymbolchanges(unitid,unitname)
+			end
+			if (featureindex["center"] ~= nil) then
+				checkcenterchanges(unitid, unitname)
 			end
 		end
 
@@ -357,7 +360,7 @@ function updatedir(unitid,dir,noundo_)
 			end
 			unit.values[DIR] = dir
 
-			if (unittype == "text") or isglyph(unit) or (unittype == "node") or (unittype == "logic") then
+			if (unittype == "text") or isglyph(unit) or (unittype == "node") or (unittype == "logic") or (unittype == "orbit") then
 				updatecode = 1
 			end
 		end

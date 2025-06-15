@@ -59,6 +59,8 @@ function undo()
 						local undobreakrelatedunits = currentundo.breakrelatedunits
 						local undosymbolunits = currentundo.symbolunits
 						local undosymbolrelatedunits = currentundo.symbolrelatedunits
+						local undocenterunits = currentundo.centerunits
+						local undocenterrelatedunits = currentundo.centerrelatedunits
 						
 						if (#undowordunits > 0) then
 							for a,b in pairs(undowordunits) do
@@ -102,6 +104,22 @@ function undo()
 
 						if (#undosymbolrelatedunits > 0) then
 							for a,b in pairs(undosymbolrelatedunits) do
+								if (b == line[9]) then
+									updatecode = 1
+								end
+							end
+						end
+
+						if (#undocenterunits > 0) then
+							for a, b in pairs(undocenterunits) do
+								if (b == line[9]) then
+									updatecode = 1
+								end
+							end
+						end
+
+						if (#undocenterrelatedunits > 0) then
+							for a, b in pairs(undocenterrelatedunits) do
 								if (b == line[9]) then
 									updatecode = 1
 								end
@@ -162,7 +180,7 @@ function undo()
 						unit.back_init = back_init
 						unit.originalname = ogname
 						
-						if (unit.strings[UNITTYPE] == "text" or unit.strings[UNITTYPE] == "node" or unit.strings[UNITTYPE] == "logic") or isglyph(unit) then
+						if (unit.strings[UNITTYPE] == "text" or unit.strings[UNITTYPE] == "node" or unit.strings[UNITTYPE] == "logic") or isglyph(unit) or (unit.strings[UNITTYPE] == "orbit") then
 							updatecode = 1
 						end
 						
@@ -175,6 +193,8 @@ function undo()
 						local undowordrelatedunits = currentundo.wordrelatedunits
 						local undosymbolunits = currentundo.symbolunits
 						local undosymbolrelatedunits = currentundo.symbolrelatedunits
+						local undocenterunits = currentundo.centerunits
+						local undocenterrelatedunits = currentundo.centerrelatedunits
 						
 						if (#undowordunits > 0) then
 							for a,b in ipairs(undowordunits) do
@@ -203,6 +223,22 @@ function undo()
 						if (#undosymbolrelatedunits > 0) then
 							for a,b in ipairs(undosymbolrelatedunits) do
 								if (b == line[6]) then
+									updatecode = 1
+								end
+							end
+						end
+						
+						if (#undocenterunits > 0) then
+							for a, b in pairs(undocenterunits) do
+								if (b == line[9]) then
+									updatecode = 1
+								end
+							end
+						end
+
+						if (#undocenterrelatedunits > 0) then
+							for a, b in pairs(undocenterrelatedunits) do
+								if (b == line[9]) then
 									updatecode = 1
 								end
 							end
@@ -228,7 +264,7 @@ function undo()
 						MF_remove(unitid)
 						dynamicat(x,y)
 						
-						if (unittype == "text" or unittype == "node" or unittype == "logic") or isglyph(unit, unitname) then
+						if (unittype == "text" or unittype == "node" or unittype == "logic" or unittype == "orbit") or isglyph(unit, unitname) then
 							updatecode = 1
 						end
 						
@@ -236,7 +272,9 @@ function undo()
 						local undowordrelatedunits = currentundo.wordrelatedunits
 						local undosymbolunits = currentundo.symbolunits
 						local undosymbolrelatedunits = currentundo.symbolrelatedunits
-						
+						local undocenterunits = currentundo.centerunits
+						local undocenterrelatedunits = currentundo.centerrelatedunits
+
 						if (#undowordunits > 0) then
 							for a,b in ipairs(undowordunits) do
 								if (b == line[3]) then
@@ -263,6 +301,22 @@ function undo()
 
 						if (#undosymbolrelatedunits > 0) then
 							for a,b in ipairs(undosymbolrelatedunits) do
+								if (b == line[3]) then
+									updatecode = 1
+								end
+							end
+						end
+
+						if (#undocenterunits > 0) then
+							for a,b in ipairs(undocenterunits) do
+								if (b == line[3]) then
+									updatecode = 1
+								end
+							end
+						end
+
+						if (#undocenterrelatedunits > 0) then
+							for a,b in ipairs(undocenterrelatedunits) do
 								if (b == line[3]) then
 									updatecode = 1
 								end
@@ -325,12 +379,14 @@ function undo()
 					local undowordrelatedunits = currentundo.wordrelatedunits
 					local undosymbolunits = currentundo.symbolunits
 					local undosymbolrelatedunits = currentundo.symbolrelatedunits
-					
+					local undocenterunits = currentundo.centerunits
+					local undocenterrelatedunits = currentundo.centerrelatedunits
+
 					local unitid = getunitid(line[10])
 					if (unitid ~= nil) and (unitid ~= 0) then
 						local unit = mmf.newObject(unitid)
-						
-						if (unit.strings[UNITTYPE] == "text" or unit.strings[UNITTYPE] == "logic") or isglyph(unit) then
+
+						if (unit.strings[UNITTYPE] == "text" or unit.strings[UNITTYPE] == "logic" or unit.strings[UNITTYPE] == "orbit") or isglyph(unit) then
 							updatecode = 1
 						end
 					end
@@ -361,6 +417,22 @@ function undo()
 
 					if (#undosymbolrelatedunits > 0) then
 						for a,b in pairs(undosymbolrelatedunits) do
+							if (b == line[10]) then
+								updatecode = 1
+							end
+						end
+					end
+
+					if (#undocenterunits > 0) then
+						for a,b in pairs(undocenterunits) do
+							if (b == line[10]) then
+								updatecode = 1
+							end
+						end
+					end
+
+					if (#undocenterrelatedunits > 0) then
+						for a,b in pairs(undocenterrelatedunits) do
 							if (b == line[10]) then
 								updatecode = 1
 							end
@@ -423,6 +495,8 @@ function undo()
 		nextundo.wordrelatedunits = {}
 		nextundo.symbolunits = {}
 		nextundo.symbolrelatedunits = {}
+		nextundo.centerunits = {}
+		nextundo.centerrelatedunits = {}
 		nextundo.visiontargets = {}
 		nextundo.breakunits = {}
 		nextundo.breakrelatedunits = {}
@@ -445,6 +519,14 @@ function undo()
 		end
 		for i,v in ipairs(currentundo.breakrelatedunits) do
 			table.insert(nextundo.breakrelatedunits, v)
+		end
+
+		for i, v in ipairs(currentundo.centerunits) do
+			table.insert(nextundo.centerunits, v)
+		end
+
+		for i, v in ipairs(currentundo.centerrelatedunits) do
+			table.insert(nextundo.centerrelatedunits, v)
 		end
 		
 		if (#currentundo.visiontargets > 0) then
@@ -494,6 +576,8 @@ function newundo()
 		thisundo.symbolrelatedunits = {}
 		thisundo.breakunits = {}
 		thisundo.breakrelatedunits = {}
+		thisundo.centerunits = {}
+		thisundo.centerrelatedunits = {}
 		thisundo.visiontargets = {}
 		
 		if (#wordunits > 0) then
@@ -514,6 +598,13 @@ function newundo()
 			for i,v in ipairs(symbolunits) do
 				local wunit = mmf.newObject(v[1])
 				table.insert(thisundo.symbolunits, wunit.values[ID])
+			end
+		end
+
+		if (#centerunits > 0) then
+			for i, v in ipairs(centerunits) do
+				local wunit = mmf.newObject(v[1])
+				table.insert(thisundo.centerunits, wunit.values[ID])
 			end
 		end
 		
@@ -553,6 +644,17 @@ function newundo()
 					table.insert(thisundo.breakrelatedunits, wunit.values[ID])
 				else
 					--table.insert(thisundo.wordrelatedunits, wunit.values[ID])
+				end
+			end
+		end
+
+		if (#centerrelatedunits > 0) then
+			for i, v in ipairs(centerrelatedunits) do
+				if (v[1] ~= 2) then
+					local wunit = mmf.newObject(v[1])
+					table.insert(thisundo.centerrelatedunits, wunit.values[ID])
+				else
+					--table.insert(thisundo.centerrelatedunits, wunit.values[ID])
 				end
 			end
 		end

@@ -1844,7 +1844,7 @@ function moveblock(onlystartblock_)
 										newunit.followed = followed
 										newunit.back_init = back_init
 
-										if (newunit.strings[UNITTYPE] == "text" or newunit.strings[UNITTYPE] == "node") or isglyph(newunit) or (newunit.strings[UNITTYPE] == "logic") then
+										if (newunit.strings[UNITTYPE] == "text" or newunit.strings[UNITTYPE] == "node") or isglyph(newunit) or (newunit.strings[UNITTYPE] == "orbit") or (newunit.strings[UNITTYPE] == "logic") then
 											updatecode = 1
 										end
 
@@ -2945,7 +2945,7 @@ function effectblock()
 				end
 			elseif (#unit.colours == 0) then
 				if (unit.values[A] > 0) and (math.floor(unit.values[A]) == unit.values[A]) then
-					if ((unit.strings[UNITTYPE] ~= "text" and unit.strings[UNITTYPE] ~= "node" and unit.strings[UNITTYPE] ~= "logic") and (string.sub(unit.strings[UNITNAME],1,6) ~= "glyph_")) or (unit.active == false) then
+					if ((unit.strings[UNITTYPE] ~= "text" and unit.strings[UNITTYPE] ~= "node" and unit.strings[UNITTYPE] ~= "logic") and (string.sub(unit.strings[UNITNAME],1,6) ~= "glyph_") and unit.strings[UNITTYPE] ~= "orbit") or (unit.active == false) then
 						setcolour(unit.fixed)
 					else
 						setcolour(unit.fixed,"active")
@@ -2955,7 +2955,7 @@ function effectblock()
 			else
 				unit.values[A] = ca
 
-				if (unit.strings[UNITTYPE] == "text") or (unit.strings[UNITTYPE] == "logic")  or (string.sub(unit.strings[UNITNAME],1,6) ~= "glyph_") then
+				if (unit.strings[UNITTYPE] == "text") or (unit.strings[UNITTYPE] == "logic")  or (string.sub(unit.strings[UNITNAME],1,6) == "glyph_") or (unit.strings[UNITTYPE] == "orbit") then
 					local curr = (unit.currcolour % #unit.colours) + 1
 					local c = unit.colours[curr]
 

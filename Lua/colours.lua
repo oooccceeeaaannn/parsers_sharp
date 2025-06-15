@@ -9,7 +9,7 @@ function updatecolours(edit_)
 	
 	for i,unit in ipairs(units) do
 		if (unit.strings[UNITNAME] ~= "level") then
-			if (unit.strings[UNITTYPE] ~= "text" and unit.strings[UNITTYPE] ~= "node" and unit.strings[UNITTYPE] ~= "logic") then
+			if (unit.strings[UNITTYPE] ~= "text" and unit.strings[UNITTYPE] ~= "node" and unit.strings[UNITTYPE] ~= "logic" and unit.strings[UNITTYPE] ~= "orbit") then
 				setcolour(unit.fixed)
 			else
 				if edit then

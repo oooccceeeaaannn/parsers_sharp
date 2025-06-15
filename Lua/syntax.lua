@@ -41,7 +41,7 @@ function addunit(id,undoing_,levelstart_)
 		unitlists[name] = {}
 	end
 
-	if (string.sub(name_, 1, 5) == "text_" or string.sub(name_, 1, 5) == "node_") or (string.sub(name_, 1, 6) == "logic_") then
+	if (string.sub(name_, 1, 5) == "text_" or string.sub(name_, 1, 5) == "node_") or (string.sub(name_, 1, 6) == "logic_") or (string.sub(name_, 1, 6) == "orbit_") then
 		unit.flags[META] = true
 	end
 
@@ -103,13 +103,13 @@ function addunit(id,undoing_,levelstart_)
 	end
 	fullunitlist[name__] = 1
 
-	if (unit.strings[UNITTYPE] == "text") or (unit.strings[UNITTYPE] == "logic") then
+	if (unit.strings[UNITTYPE] == "text") or (unit.strings[UNITTYPE] == "orbit") or (unit.strings[UNITTYPE] == "logic") then
 		table.insert(codeunits, unit.fixed)
 		updatecode = 1
 		
-		if (unit.values[TYPE] == 0) or string.sub(name_,1,6) == "logic_" then 
+		if (unit.values[TYPE] == 0) or string.sub(name_,1,6) == "logic_" or string.sub(name_, 1, 6) == "orbit_" then 
 			local matname = string.sub(unit.strings[UNITNAME], 6)
-			if unit.strings[UNITTYPE] == "logic" then
+			if unit.strings[UNITTYPE] == "logic" or unit.strings[UNITTYPE] == "orbit" then
 				matname = string.sub(unit.strings[UNITNAME], 7)
 			end
 			if (unitlists[matname] == nil) then
