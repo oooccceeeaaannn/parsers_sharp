@@ -171,6 +171,7 @@ glyphtypes = {
 	metaevent = 5,
 	metanode = 5,
 	metalogic = 5,
+	metaorbit = 5,
 	metanot = 4,
 	node = 0,
 	group = 3,
@@ -2259,7 +2260,7 @@ function isverb(input_string, id)
 	if string.sub(input_string,1,6) ~= "glyph_" then
 		return false
 	end
-	if (metaglyphdata[id] == 1) then
+	if (metaglyphdata[id] ~= 0) and (metaglyphdata[id] ~= nil) then
 		return false
 	end
 	-- for i,j in pairs(glyphverbs) do
@@ -2307,7 +2308,7 @@ function isglyphmeta(input_string, id)
 	if string.sub(input_string,1,6) ~= "glyph_" then
 		return false
 	end
-	return (input_string == "glyph_metaglyph") or (input_string == "glyph_metatext") or (input_string == "glyph_metaevent") or (input_string == "glyph_metanode") or (input_string == "glyph_metalogic")
+	return (input_string == "glyph_metaglyph") or (input_string == "glyph_metatext") or (input_string == "glyph_metaevent") or (input_string == "glyph_metanode") or (input_string == "glyph_metalogic") or (input_string == "glyph_metaorbit")
 end
 
 function isprefix(input_string, id)
@@ -2400,6 +2401,7 @@ local function metaparserprefix(x, y)
 	local is_event = false
 	local is_node = false
 	local is_logic = false
+	local is_orbit = false
 	local im_done = false
 	if (tilemetaglyphdata[x + y * roomsizex] ~= nil) then
 		if tilemetaglyphdata[x + y * roomsizex] == 1 then
@@ -2412,6 +2414,8 @@ local function metaparserprefix(x, y)
 			return "node_"
 		elseif tilemetaglyphdata[x + y * roomsizex] == 5 then
 			return "logic_"
+		elseif tilemetaglyphdata[x + y * roomsizex] == 6 then
+			return "orbit_"
 		elseif tilemetaglyphdata[x + y * roomsizex] == 0 then
 			return ""
 		end
@@ -2431,6 +2435,8 @@ local function metaparserprefix(x, y)
 					is_node = true
 				elseif (name == "glyph_metalogic") then
 					is_logic = true
+				elseif (name == "glyph_metaorbit") then
+					is_orbit = true
 				elseif (name == "glyph_metaglyph") then
 					is_meta = true
 					im_done = true
@@ -2457,6 +2463,9 @@ local function metaparserprefix(x, y)
 	elseif is_logic then
 		tilemetaglyphdata[x + y * roomsizex] = 5
 		return "logic_"
+	elseif is_orbit then
+		tilemetaglyphdata[x + y * roomsizex] = 6
+		return "orbit_"
 	else
 		tilemetaglyphdata[x + y * roomsizex] = 0
 		return ""
@@ -2469,14 +2478,15 @@ local function parser_prefix(x, y)
 	local is_event = 0
 	local is_node = 0
 	local is_logic = 0
-	local im_done = 0
+	local is_orbit = 0
 	if (tileparser_prefixdata[x + y * roomsizex] ~= nil) then
-		is_meta, is_text, is_event, is_node, is_logic = table.unpack(tileparser_prefixdata[x + y * roomsizex])
+		is_meta, is_text, is_event, is_node, is_logic, is_orbit = table.unpack(tileparser_prefixdata[x + y * roomsizex])
 		return string.rep("glyph_", is_meta) ..
 		 string.rep("text_", is_text) ..
 		  string.rep("event_", is_event) ..
 		   string.rep("node_", is_node) ..
-		    string.rep("logic_", is_logic)
+		    string.rep("logic_", is_logic) ..
+			 string.rep("orbit_", is_orbit)
 	end
 	if unitmap[x + y * roomsizex] ~= nil then
 		for i, v in pairs(unitmap[x + y * roomsizex]) do
@@ -2492,7 +2502,8 @@ local function parser_prefix(x, y)
 				is_logic = 1 + is_logic
 			elseif (name == "glyph_glyph_") then
 				is_meta = 1 + is_meta
-
+			elseif (name == "glyph_orbit_") then
+				is_orbit = 1 + is_orbit
 			end
 		end
 	end
@@ -2501,8 +2512,9 @@ local function parser_prefix(x, y)
 	 string.rep("text_", is_text) ..
 	  string.rep("event_", is_event) ..
 	   string.rep("node_", is_node) ..
-	    string.rep("logic_", is_logic)
-	tileparser_prefixdata[x + y * roomsizex] = {is_meta, is_text, is_event, is_node, is_logic}
+	    string.rep("logic_", is_logic) ..
+		 string.rep("orbit_", is_orbit)
+	tileparser_prefixdata[x + y * roomsizex] = {is_meta, is_text, is_event, is_node, is_logic, is_orbit}
 	return prefix
 end
 
@@ -3026,6 +3038,9 @@ function determinemetaglyphs(glyphtable)
 		elseif (prefix == "logic_") then
 			metaglyphdata[j] = 5
 			tilemetaglyphdata[x + y * roomsizex] = 5
+		elseif (prefix == "orbit_") then
+			metaglyphdata[j] = 6
+			tilemetaglyphdata[x + y * roomsizex] = 6
 		else
 			metaglyphdata[j] = 0
 			tilemetaglyphdata[x + y * roomsizex] = 0

@@ -906,7 +906,7 @@ function doconvert(data,extrarule_)
 		if delthis and (unit.flags[DEAD] == false) then
 			addundo({"remove",unit.strings[UNITNAME],unit.values[XPOS],unit.values[YPOS],unit.values[DIR],unit.values[ID],unit.values[ID],unit.strings[U_LEVELFILE],unit.strings[U_LEVELNAME],unit.values[VISUALLEVEL],unit.values[COMPLETED],unit.values[VISUALSTYLE],unit.flags[MAPLEVEL],unit.strings[COLOUR],unit.strings[CLEARCOLOUR],unit.followed,unit.back_init,unit.originalname,unit.strings[UNITSIGNTEXT]})
 
-			if (unit.strings[UNITTYPE] == "text" or unit.strings[UNITTYPE] == "node" or unit.strings[UNITTYPE] == "logic" or (newunit.strings[UNITTYPE] == "orbit")) then
+			if (unit.strings[UNITTYPE] == "text" or unit.strings[UNITTYPE] == "node" or unit.strings[UNITTYPE] == "logic" or (unit.strings[UNITTYPE] == "orbit")) then
 				updatecode = 1
 			end
 			
@@ -960,7 +960,7 @@ function doconvert(data,extrarule_)
 				
 				emptydata[tileid]["conv"] = true
 				
-				if (newunit.strings[UNITTYPE] == "text" or newunit.strings[UNITTYPE] == "node") then
+				if (newunit.strings[UNITTYPE] == "text" or newunit.strings[UNITTYPE] == "logic" or newunit.strings[UNITTYPE] == "orbit" or newunit.strings[UNITTYPE] == "node") then
 					updatecode = 1
 				else
 					if (featureindex["word"] ~= nil) then
