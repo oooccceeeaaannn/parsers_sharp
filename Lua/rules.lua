@@ -33,6 +33,7 @@ function code(alreadyrun_)
 			local checkthese = {}
 			local wordidentifier = ""
 			local centeridentifier = ""
+			local flowidentifier = ""
 			wordunits,wordidentifier,wordrelatedunits = findwordunits()
 			symbolunits,symbolidentifier,symbolrelatedunits = findsymbolunits()
 			flowunits,flowidentifier,flowrelatedunits = findflowunits()
@@ -3957,7 +3958,7 @@ function findwordunits()
 							notname = string.sub(name, 5)
 						end
 
-						if (firstunit.strings[UNITNAME] ~= "text_" .. name) and (firstunit.strings[UNITNAME] ~= "text_" .. notname) then
+						if ((firstunit.strings[UNITNAME] ~= "text_" .. name) and (firstunit.strings[UNITNAME] ~= "text_" .. notname)) or ((firstunit.strings[UNITNAME] ~= "logic_" .. name) and (firstunit.strings[UNITNAME] ~= "logic_" .. notname)) then
 							--MF_alert("Checking recursion for " .. name)
 							table.insert(checkrecursion, {name, i})
 						end

@@ -91,6 +91,9 @@ addlogic("mimic",1,{2,1},{2,2},{0},-1)
 addlogic("write",1,{0,1},{0,3},{0,2},-1)
 addlogic("log",1,{0,1},{0,3},{0,2},-1)
 
+--and
+addlogic("and",15,{0,1},{0,3},{0,2},-1)
+
 --prefixes
 addlogic("idle",6,{2,2},{2,3},{},-1)
 addlogic("lonely",6,{2,1},{2,2},{},-1)
@@ -118,6 +121,10 @@ addlogic("true",5,{5,1},{5,3},{},0)
 addlogic("omnitrue",8,{1,2},{1,4},{},-1)
 addlogic("false",5,{2,1},{2,2},{},0)
 addlogic("omnifalse",8,{2,2},{2,3},{},-1)
+addlogic("null",5,{0,1},{0,2},{},0)
+addlogic("omninull",8,{0,2},{0,3},{},-1)
+addlogic("truefalse",14,{3,0},{3,1},{},0)
+addlogic("opposite",14,{3,0},{3,1},{},0)
 
 --not
 addlogic("not",7,{2,1},{2,2},{},-1)
@@ -168,6 +175,8 @@ addlogic("door",0,{2,1},{2,2},{},-1)
 addlogic("key",0,{6,1},{2,4},{},-1)
 addlogic("square",0,{4,0},{4,1},{},-1)
 addlogic("circle",0,{5,2},{5,3},{},-1)
+addlogic("triangle",0,{3,2},{3,3},{},-1)
+addlogic("love",0,{4,1},{4,2},{},-1)
 addlogic("fruit",0,{2,1},{2,2},{},-1)
 addlogic("tree",0,{5,1},{5,2},{},-1)
 addlogic("trees",0,{5,1},{5,2},{},-1)
@@ -181,6 +190,10 @@ addlogic("cliff",0,{6,1},{6,2},{},-1)
 addlogic("star",0,{6,1},{2,4},{},-1)
 addlogic("moon",0,{6,1},{2,4},{},-1)
 addlogic("dust",0,{6,1},{2,4},{},-1)
+addlogic("flower",0,{3,2},{3,3},{},-1)
+addlogic("leaf",0,{6,1},{2,4},{},-1)
+addlogic("reed",0,{6,1},{6,2},{},-1)
+addlogic("fence",0,{6,1},{6,2},{},-1)
 
 --props
 addlogic("you",2,{4,0},{4,1},{},-1)
@@ -228,6 +241,8 @@ addlogic("deturn",2,{1,2},{1,4},{},-1)
 addlogic("power",2,{6,1},{2,4},{},-1)
 addlogic("power2",2,{5,2},{5,3},{},-1)
 addlogic("power3",2,{3,2},{4,4},{},-1)
+addlogic("done",2,{0,1},{0,3},{},-1)
+--addlogic("word",2,{0,1},{0,3},{},-1)
 
 formatobjlist()
 
