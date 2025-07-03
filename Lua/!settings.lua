@@ -1,6 +1,16 @@
 -- Enables legacy parsing.
 NODE_LEGACY_PARSING = false
 
+NODE_SORT_BY_TYPE = false --[[
+Set this to true to make nodes in the editor palette sort alphabetically within their type, rather than just alphabetically.
+Nils will be grouped further into standard and bump, and nouns will be grouped further into normal and special.
+]]
+
+NODE_METAS = true --[[
+Set this to true to add metanodes to the editor palette. A metatext implementation is not provided with this mod, so only enable
+this if you have merged one in.
+]]
+
 disable_toometa = true
 --[[ This file is named this way to make sure it runs first.
 Obviously, this is ripping off- I mean, INSPIRED by Plasmaflare's.]]

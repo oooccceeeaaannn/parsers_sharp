@@ -587,7 +587,7 @@ function newundo()
 			end
 		end
 
-        if (#breakunits > 0) then
+        if (#(breakunits or {}) > 0) then
 			for i,v in ipairs(breakunits) do
 				local wunit = mmf.newObject(v[1])
 				table.insert(thisundo.breakunits, wunit.values[ID])
@@ -637,7 +637,7 @@ function newundo()
 			end
 		end
 
-		if (#breakrelatedunits > 0) then
+		if (#(breakrelatedunits or {}) > 0) then
 			for i,v in ipairs(breakrelatedunits) do
 				if (v[1] ~= 2) then
 					local wunit = mmf.newObject(v[1])
