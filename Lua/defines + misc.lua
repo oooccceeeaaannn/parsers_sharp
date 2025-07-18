@@ -413,6 +413,8 @@ function tryautogenerate(want, have)
 		elseif string.sub(want,1,5) == "node_" then
 			type = "node"
 			tiling = 0
+		elseif string.sub(want,1,6) == "orbit_" then
+			type = "orbit"
 		end
 		local new =
 		{

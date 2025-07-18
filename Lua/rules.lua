@@ -2401,7 +2401,7 @@ function addoption(option,conds_,ids,visible,notrule,tags_,visualonly_)
 					end
 				end
 			else
-				local mats = {"empty","text","glyph","event","node","logic"}
+				local mats = {"empty","text","glyph","event","node","logic","orbit"} --@notice: need update after adding a new parser
 
 				for m,i in pairs(mats) do
 					local rule = {i,verb,effect}
@@ -3129,7 +3129,7 @@ function grouprules()
 			groupname1 = string.sub(rule[1], 5)
 		end
 
-		if (string.sub(rule[3], 1, 5) == "group") then
+		if (string.sub(rule[3], 1, 5) == "group") and (rule[1] ~= "not all") then
 			type_xgroup = true
 			groupname2 = rule[3]
 
