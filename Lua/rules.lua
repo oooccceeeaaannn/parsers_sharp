@@ -2083,7 +2083,7 @@ function addoption(option,conds_,ids,visible,notrule,tags_,visualonly_)
 		MF_alert("nil conditions in rule: " .. option[1] .. ", " .. option[2] .. ", " .. option[3])
 	end
 	local tags = tags_ or {}
-	--[[
+	--[=[
 	local shownrule = nil
 	if (string.sub(option[1], 1, 5) == "text_") then
 		if shownrule == nil then
@@ -2156,7 +2156,7 @@ function addoption(option,conds_,ids,visible,notrule,tags_,visualonly_)
 		--]]
 		visualonly = true
 	end
-
+	--]=]
 	if (#option == 3) then
 		local rule = {option,conds,ids,tags}
 		local target = option[1]
@@ -2958,15 +2958,23 @@ function subrules()
 								table.insert(newtags, d)
 							end
 
+							table.insert(newtags, "mimicparent_" .. tostring(i))
 							table.insert(newtags, "mimic")
-
+							
 							local newword1 = object
 							local newword2 = trule[2]
 							local newword3 = trule[3]
-
+							
 							local newrule = {newword1, newword2, newword3}
-
-							addoption(newrule,newconds,ids,visual,nil,newtags,visualonly)
+							
+							limiter = limiter + 1
+							addoption(newrule,newconds,ids,true,nil,newtags,visualonly)
+							
+							if (limiter > limit) then
+								MF_alert("Level destroyed - mimic happened too many times!")
+								destroylevel("toocomplex")
+								return
+							end
 						end
 					end
 				end

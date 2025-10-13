@@ -68,6 +68,8 @@ function init(tilemapid,roomsizex_,roomsizey_,tilesize_,Xoffset_,Yoffset_,genera
 	deletereference = {}
 	poweredstatus = {}
 	specialtiling = {}
+	backparticles = {}
+	
 	breakunits = {}
 	breakrelatedunits = {}
 	
